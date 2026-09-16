@@ -1,0 +1,6 @@
+# Worst-case snap-taut: constant speed, then an abrupt stop at the end position.
+# Inherits every (PLACEHOLDER) value from baseline.yaml.
+base: baseline.yaml
+run_name: snap_worst_case
+deployment:
+  profile: constant_then_stop

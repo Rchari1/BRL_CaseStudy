@@ -1,0 +1,67 @@
+# Baseline Flarewing blanket deployment: in-orbit case (gravity and drag off).
+#
+# !!! EVERY PHYSICAL VALUE IN THIS FILE IS A PLACEHOLDER !!!
+# Nothing here has been measured. Replace with coupon/fold/deployment test data.
+# Units: SI. "per width" = per metre of blanket width (the model is a 1 m strip).
+
+run_name: baseline
+
+blanket:
+  n_panels: 8                    # PLACEHOLDER module count
+  panel_length: 0.5              # m, PLACEHOLDER module length
+  nodes_per_panel: 20            # numerics: segments per panel (25 mm; see README numerical notes)
+  areal_density: 1.0             # kg/m^2, PLACEHOLDER (cells + Kapton + encapsulant)
+  EA: 1.25e5                     # N/m per width, PLACEHOLDER (Kapton E ~2.5 GPa x 50 um)
+  panel_EI: 1.0e-2               # N*m per width, PLACEHOLDER (cells + laminate)
+  blanket_width: 1.0             # m, scale factor for total loads
+  min_cell_bend_radius: 0.5      # m, PLACEHOLDER allowable for silicon strips
+  axial_damping_ratio: 0.02      # PLACEHOLDER, at the 1st axial mode of the deployed blanket
+  panel_bending_damping_ratio: 0.02  # PLACEHOLDER, at the 1st free-free panel bending mode
+
+hinge:
+  law: linear                    # linear | tabulated (hook for measured moment-angle curves)
+  k_hinge: 2.6e-2                # N*m/rad per width, PLACEHOLDER (film EI 2.6e-5 over ~1 mm)
+  theta_rest: 0.3pi              # rad, PLACEHOLDER fold memory (0 = flat, pi = stowed)
+  damping_ratio: 0.05            # PLACEHOLDER, one panel rotating about its hinge
+  table_file: ""                 # CSV fold_angle_rad,moment_Nm_per_m when law = tabulated
+
+attachments:
+  k_att_root: 1.0e5              # N/m per width, PLACEHOLDER structure compliance
+  c_att_root: 50.0               # N*s/m per width, PLACEHOLDER
+  k_att_tip: 1.0e5               # N/m per width, PLACEHOLDER structure compliance
+  c_att_tip: 50.0                # N*s/m per width, PLACEHOLDER
+
+deployment:
+  profile: smooth                # smooth | trapezoid | constant_then_stop
+  T_deploy: 30.0                 # s, PLACEHOLDER
+  accel_fraction: 0.2            # trapezoid only
+  start_ramp_fraction: 0.1       # constant_then_stop only
+  preload_strain: 1.0e-4         # PLACEHOLDER final tension preload
+  stow_gap: 1.0e-3               # m, PLACEHOLDER layer gap in the stowed stack
+  T_settle: 3.0                  # s, tip held while initial spring forces equilibrate
+  settle_mass_damping: 4.0       # 1/s, numerical damping during settle only
+  T_hold: 5.0                    # s, simulated after the tip stops
+
+environment:
+  gravity: false
+  gravity_direction: "-z"
+  g: 9.80665
+  drag: false
+  air_density: 1.2               # kg/m^3
+  drag_coefficient: 1.5          # PLACEHOLDER flat-plate estimate
+
+numerics:
+  dt: auto
+  dt_safety: 0.5
+  axial_stiffness_scale: 1.0     # < 1 speeds up runs but UNDER-predicts snap-taut peaks
+
+output:
+  dir: results
+  field_dt: 0.01
+  channel_dt: 5.0e-4
+  snap_window_pre: 0.03
+  snap_window_post: 0.09
+  animation: true
+  animation_fps: 30
+  animation_seconds: 16.0
+  gif: true

@@ -1,0 +1,13 @@
+# Ground-test case: gravity along -z (sags the deployed blanket) and air drag on.
+# No stowage container, tray or gravity offload is modelled: during the settle
+# phase the unsupported stack drops into a hanging loop between root and tip.
+# Inherits every (PLACEHOLDER) value from baseline.yaml.
+base: baseline.yaml
+run_name: ground_test
+environment:
+  gravity: true
+  gravity_direction: "-z"
+  drag: true
+deployment:
+  T_settle: 8.0
+  settle_mass_damping: 3.0

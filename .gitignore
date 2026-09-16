@@ -1,0 +1,4 @@
+# Large binary results (regenerate with the CLI); figures, animations, CSVs and summaries are kept.
+results/**/results.jld2
+*.jls
+.DS_Store
