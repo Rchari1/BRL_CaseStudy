@@ -26,6 +26,10 @@ include("config.jl")
 include("forces.jl")
 include("integrator.jl")
 include("outputs.jl")
+include("theme.jl")
+include("sweep.jl")
+include("plots.jl")
+include("cli.jl")
 
 export default_config, load_config, set_param!, get_param, SimParams, print_startup
 export Layout, build_layout, stowed_positions, flat_positions, turning_angles, polyline_length
@@ -34,5 +38,7 @@ export SmoothProfile, TrapezoidProfile, ConstantThenStopProfile, progress, Ancho
 export LinearHinge, TabulatedHinge, hinge_moment, hinge_energy
 export simulate, SimResult, summary_metrics, summary_line, save_results, write_summary
 export flat_length, blanket_mass
+export plot_run, animate_run
+export load_sweep, run_sweep, aggregate, sensitivity_table, plot_sweep, cli_run, cli_sweep
 
 end

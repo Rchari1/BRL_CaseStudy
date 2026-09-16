@@ -1,0 +1,60 @@
+# One-at-a-time parameter sweeps around the baseline (build brief, Section 7).
+# Every point runs with T_deploy x {0.97, 1.00, 1.03}: the spread shows how much
+# the peak depends on the phase of residual flapping ("phase noise floor").
+# All parameters are PLACEHOLDERS; results show scaling, not predictions.
+
+name: sweep
+base: baseline.yaml
+out_dir: results/sweep
+profiles: [smooth, constant_then_stop]
+jitter: [0.97, 1.0, 1.03]
+# segment_length defaults to the baseline's (panel_length / nodes_per_panel)
+# and is held fixed, so changing panel length does not change resolution.
+
+overrides:
+  output:
+    animation: false
+
+groups:
+  - name: Deployment time
+    key: deployment.T_deploy
+    values: [7.5, 15, 30, 60, 120]
+    scale: log
+    profiles: [smooth, trapezoid, constant_then_stop]
+
+  - name: Panel count (4 m total)
+    key: blanket.n_panels
+    values: [4, 6, 8, 12, 16]
+    fixed_total_length: true
+
+  - name: Hinge stiffness k_hinge
+    key: hinge.k_hinge
+    values: [8.22e-3, 1.46e-2, 2.6e-2, 4.62e-2, 8.22e-2]   # one decade centred on baseline
+    scale: log
+
+  - name: Fold rest angle θ_rest
+    key: hinge.theta_rest
+    values: [0.0949pi, 0.169pi, 0.3pi, 0.533pi, 0.949pi]   # one decade centred on baseline
+    scale: log
+
+  - name: Hinge damping ratio
+    key: hinge.damping_ratio
+    values: [0.01, 0.02, 0.05, 0.1, 0.2]
+    scale: log
+
+  - name: Tip attachment stiffness
+    key: attachments.k_att_tip
+    values: [1.0e4, 3.16e4, 1.0e5, 3.16e5, 1.0e6]          # two decades
+    scale: log
+
+  - name: Environment
+    cases:
+      - label: orbit
+        baseline: true
+        set: {environment.gravity: false, environment.drag: false}
+      - label: drag only
+        set: {environment.gravity: false, environment.drag: true}
+      - label: gravity only
+        set: {environment.gravity: true, environment.drag: false, deployment.T_settle: 8.0, deployment.settle_mass_damping: 3.0}
+      - label: ground (g + drag)
+        set: {environment.gravity: true, environment.drag: true, deployment.T_settle: 8.0, deployment.settle_mass_damping: 3.0}
