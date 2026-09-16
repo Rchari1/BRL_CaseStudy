@@ -231,6 +231,49 @@ const QUIET = (verbose = false,)
         @test arc_end >= L_end - tip_offset
     end
 
+    @testset "Hysteretic hinge (stretch goal)" begin
+        # Closed cycle of the fold angle: work done on the fold equals the energy
+        # the law reports as released, and the loop encloses positive area.
+        h = HystereticHinge(2.6e-2, 0.3pi, 0.2, 0.01, 0.0)
+        A, n = 0.4, 4000
+        path = vcat(range(0, A; length = n), range(A, -A; length = 2n), range(-A, A; length = 2n))
+        s_ = 0.0
+        work = 0.0
+        released = 0.0
+        E_start = NaN
+        started = false
+        for k in 2:length(path)
+            φ0, φ1 = path[k-1], path[k]
+            if !started && k == n + 1                 # steady loop starts at phi = A
+                started = true
+                E_start = hinge_energy(h, φ0, s_)
+            end
+            M0 = hinge_moment(h, φ0, 0.0, s_)
+            s_, rel = hinge_update_state(h, φ1, s_)
+            M1 = hinge_moment(h, φ1, 0.0, s_)
+            if started
+                work += -0.5(M0 + M1) * (φ1 - φ0)     # work done ON the fold
+                released += rel
+            end
+        end
+        loop_energy = hinge_energy(h, path[end], s_) - E_start
+        @info "hysteretic hinge" work released loop_energy
+        @test released > 0
+        @test abs(loop_energy) < 1e-6
+        @test isapprox(work, released; rtol = 2e-3)
+
+        cfg = cfg_with("blanket.n_panels" => 4, "deployment.T_deploy" => 3.0, "deployment.T_settle" => 0.5,
+            "deployment.T_hold" => 1.0, "hinge.law" => "hysteretic", "hinge.k_elastic" => 0.2,
+            "hinge.yield_moment" => 0.01)
+        r = simulate(SimParams(cfg); record_fields = false, QUIET...)
+        cfg_lin = cfg_with("blanket.n_panels" => 4, "deployment.T_deploy" => 3.0, "deployment.T_settle" => 0.5,
+            "deployment.T_hold" => 1.0)
+        r_lin = simulate(SimParams(cfg_lin); record_fields = false, QUIET...)
+        @info "hysteretic deployment" balance = r.balance_error D_hinge = r.ch["D_hinge"][end] D_hinge_linear = r_lin.ch["D_hinge"][end]
+        @test r.balance_error < 0.01
+        @test r.ch["D_hinge"][end] > r_lin.ch["D_hinge"][end]
+    end
+
     @testset "Profiles and hinge-law hook" begin
         for prof in (SmoothProfile(10.0), TrapezoidProfile(10.0, 0.2), ConstantThenStopProfile(10.0, 0.1))
             @test progress(prof, -1.0) == (0.0, 0.0)

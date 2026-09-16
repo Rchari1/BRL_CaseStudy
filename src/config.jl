@@ -27,11 +27,13 @@ function default_config()
             "panel_bending_damping_ratio" => 0.02, # placeholder
         ),
         "hinge" => Dict{String,Any}(
-            "law" => "linear",                   # linear | tabulated
+            "law" => "linear",                   # linear | tabulated | hysteretic
             "k_hinge" => 2.6e-2,                 # N*m/rad per width, placeholder
             "theta_rest" => 0.3pi,               # rad, placeholder fold memory
             "damping_ratio" => 0.05,             # placeholder
             "table_file" => "",                  # CSV (fold_angle_rad, moment_Nm_per_m)
+            "k_elastic" => 0.0,                  # hysteretic law: N*m/rad per width, placeholder
+            "yield_moment" => 0.0,               # hysteretic law: N*m per width, placeholder
         ),
         "attachments" => Dict{String,Any}(
             "k_att_root" => 1.0e5,               # N/m per width, placeholder
@@ -260,12 +262,15 @@ function SimParams(cfg::Dict{String,Any})
     law_name = lowercase(string(get_param(cfg, "hinge.law")))
     hinge_law = if law_name == "linear"
         LinearHinge(k_h, theta_rest, c_h)
+    elseif law_name == "hysteretic"
+        HystereticHinge(k_h, theta_rest, positive(cfg, "hinge.k_elastic"; allow_zero = true),
+            positive(cfg, "hinge.yield_moment"; allow_zero = true), c_h)
     elseif law_name == "tabulated"
         file = string(get_param(cfg, "hinge.table_file"))
         isempty(file) && error("hinge.law = tabulated requires hinge.table_file")
         TabulatedHinge(file, c_h)
     else
-        error("hinge.law must be `linear` or `tabulated` (got `$law_name`)")
+        error("hinge.law must be `linear`, `tabulated` or `hysteretic` (got `$law_name`)")
     end
 
     fold_sign = zeros(lay.N)

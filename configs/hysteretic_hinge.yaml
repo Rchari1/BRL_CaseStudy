@@ -1,0 +1,8 @@
+# Stretch goal: hysteretic fold hinges (Jenkins element) as a stand-in for
+# viscoelastic fold memory. Inherits every (PLACEHOLDER) value from baseline.yaml.
+base: baseline.yaml
+run_name: hysteretic_hinge
+hinge:
+  law: hysteretic
+  k_elastic: 0.2        # N*m/rad per width, PLACEHOLDER: stiffness of small fold reversals above k_hinge
+  yield_moment: 0.01    # N*m per width, PLACEHOLDER: moment at which the fold "set" starts to slip

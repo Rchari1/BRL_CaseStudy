@@ -35,7 +35,7 @@ export default_config, load_config, set_param!, get_param, SimParams, print_star
 export Layout, build_layout, stowed_positions, flat_positions, turning_angles, polyline_length
 export SmoothProfile, TrapezoidProfile, ConstantThenStopProfile, progress, AnchorMotion,
     FixedAnchor, FunctionAnchor, anchor_state, deployed_tip_position
-export LinearHinge, TabulatedHinge, hinge_moment, hinge_energy
+export LinearHinge, TabulatedHinge, HystereticHinge, hinge_moment, hinge_energy, hinge_update_state
 export simulate, SimResult, summary_metrics, summary_line, save_results, write_summary
 export flat_length, blanket_mass
 export plot_run, animate_run

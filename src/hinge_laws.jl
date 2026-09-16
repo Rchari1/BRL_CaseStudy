@@ -5,10 +5,24 @@
 # and fold rate. Moments are per metre of width, positive when they act to
 # INCREASE phi. To use measured data, either point `hinge.table_file` at a
 # moment-angle CSV (TabulatedHinge) or add a new subtype of `HingeLaw` and
-# define `hinge_moment` and `hinge_energy` for it. Hysteretic or
-# viscoelastic laws with internal state belong here too (stretch goal).
+# define `hinge_moment` and `hinge_energy` for it. Laws with internal state
+# (hysteresis, creep) also define `hinge_state_init` and `hinge_update_state`;
+# see `HystereticHinge`.
 
 abstract type HingeLaw end
+
+# Stateless laws ignore the per-hinge state argument.
+hinge_moment(h::HingeLaw, phi::Float64, phidot::Float64, state::Float64) = hinge_moment(h, phi, phidot)
+hinge_energy(h::HingeLaw, phi::Float64, state::Float64) = hinge_energy(h, phi)
+"""Initial per-hinge state for a fold starting at angle `phi0` (stateless laws: unused)."""
+hinge_state_init(::HingeLaw, phi0::Float64) = 0.0
+"""
+    hinge_update_state(law, phi, state) -> (new_state, dissipated_energy)
+
+Advance internal state at fold angle `phi`. Returns the energy (J per metre
+width) released irreversibly by the update, which is booked as dissipation.
+"""
+hinge_update_state(::HingeLaw, phi::Float64, state::Float64) = (state, 0.0)
 
 """
     LinearHinge(k, phi_rest, c)
@@ -83,3 +97,41 @@ end
 
 hinge_stiffness_bound(h::TabulatedHinge) = h.kmax
 hinge_damping(h::TabulatedHinge) = h.c
+
+"""
+    HystereticHinge(k_rest, phi_rest, k_elastic, yield_moment, c)
+
+Jenkins-type fold with hysteresis (stretch goal: stand-in for viscoelastic fold
+memory). A spring `k_rest` to the rest angle (fold memory) acts in parallel with
+a spring `k_elastic` in series with a Coulomb slider that slips at
+`yield_moment`. Small reversals are stiff (`k_rest + k_elastic`); once the
+slider slips the fold follows `k_rest`, so loading and unloading take
+different paths and the loop area is dissipated. The slider angle is the
+per-hinge state and starts at the stowed fold angle (the fold is "set" by
+stowage). Energy released when the slider slips is booked as hinge dissipation.
+"""
+struct HystereticHinge <: HingeLaw
+    k_rest::Float64
+    phi_rest::Float64
+    k_elastic::Float64
+    yield_moment::Float64
+    c::Float64
+end
+
+hinge_moment(h::HystereticHinge, phi::Float64, phidot::Float64, phi_s::Float64) =
+    -h.k_rest * (phi - h.phi_rest) - h.k_elastic * (phi - phi_s) - h.c * phidot
+hinge_energy(h::HystereticHinge, phi::Float64, phi_s::Float64) =
+    0.5h.k_rest * (phi - h.phi_rest)^2 + 0.5h.k_elastic * (phi - phi_s)^2
+hinge_state_init(::HystereticHinge, phi0::Float64) = phi0
+function hinge_update_state(h::HystereticHinge, phi::Float64, phi_s::Float64)
+    h.k_elastic > 0 || return (phi_s, 0.0)
+    slip = h.yield_moment / h.k_elastic
+    d = phi - phi_s
+    new = d > slip ? phi - slip : d < -slip ? phi + slip : phi_s
+    released = 0.5h.k_elastic * (d^2 - (phi - new)^2)
+    (new, released)
+end
+hinge_moment(h::HystereticHinge, phi::Float64, phidot::Float64) = error("HystereticHinge needs its state; call hinge_moment(law, phi, phidot, state)")
+hinge_energy(h::HystereticHinge, phi::Float64) = error("HystereticHinge needs its state")
+hinge_stiffness_bound(h::HystereticHinge) = h.k_rest + h.k_elastic
+hinge_damping(h::HystereticHinge) = h.c

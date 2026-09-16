@@ -37,20 +37,23 @@ end
 
 """
     bending_forces!(F, Fd_panel, Fd_hinge, theta, curvature, x, v, lay,
-                    k_bend, c_bend, law, fold_sign) -> (E_panel, E_hinge)
+                    k_bend, c_bend, law, fold_sign, hinge_state) -> (E_panel, E_hinge, E_released)
 
 Torsional spring-dampers on the turning angle at interior nodes, converted to
 nodal forces through the exact angle gradient. The angle is evaluated as
 `atan2(cross, dot)` and unwrapped against the previous value stored in
 `theta` (updated in place), so folds near +-pi are well defined and cannot
 jump by 2pi. Panel nodes: `M = -k theta - c dtheta/dt` (flat rest shape).
-Hinge nodes: the hinge law in fold coordinates `phi = fold_sign * theta`.
+Hinge nodes: the hinge law in fold coordinates `phi = fold_sign * theta`;
+laws with internal state update `hinge_state` in place and report the energy
+their update released (`E_released`, booked as dissipation).
 `curvature[i]` receives theta / l_bar at panel-interior nodes (1/m), else 0.
 """
 function bending_forces!(F, Fd_panel, Fd_hinge, theta, curvature, x, v, lay::Layout,
-    k_bend, c_bend, law::HingeLaw, fold_sign)
+    k_bend, c_bend, law::HingeLaw, fold_sign, hinge_state)
     E_panel = 0.0
     E_hinge = 0.0
+    E_released = 0.0
     N = lay.N
     @inbounds for i in 2:N-1
         kind = lay.kind[i]
@@ -87,10 +90,13 @@ function bending_forces!(F, Fd_panel, Fd_hinge, theta, curvature, x, v, lay::Lay
             s = fold_sign[i]
             phi = s * th
             phidot = s * thdot
-            Mphi = hinge_moment(law, phi, phidot)
+            st, released = hinge_update_state(law, phi, hinge_state[i])
+            hinge_state[i] = st
+            E_released += released
+            Mphi = hinge_moment(law, phi, phidot, st)
             Md = -s * hinge_damping(law) * phidot   # damping part, theta coordinates
             Mtot = s * Mphi
-            E_hinge += hinge_energy(law, phi)
+            E_hinge += hinge_energy(law, phi, st)
             curvature[i] = 0.0
             F[i-1] += Mtot * gim1
             F[i] += Mtot * gi
@@ -100,7 +106,7 @@ function bending_forces!(F, Fd_panel, Fd_hinge, theta, curvature, x, v, lay::Lay
             Fd_hinge[i+1] += Md * gip1
         end
     end
-    (E_panel, E_hinge)
+    (E_panel, E_hinge, E_released)
 end
 
 """

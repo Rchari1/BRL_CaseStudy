@@ -67,13 +67,14 @@ struct Workspace
     vnew::Vector{SVector{2,Float64}}
     vbar::Vector{SVector{2,Float64}}
     theta::Vector{Float64}
+    hinge_state::Vector{Float64}
     curvature::Vector{Float64}
     tension::Vector{Float64}
 end
 
 function Workspace(N::Int)
     z() = zeros(SVector{2,Float64}, N)
-    Workspace(z(), z(), z(), z(), z(), z(), z(), z(), zeros(N), zeros(N), zeros(N - 1))
+    Workspace(z(), z(), z(), z(), z(), z(), z(), z(), zeros(N), zeros(N), zeros(N), zeros(N - 1))
 end
 
 """Sum of F[i] . v[i] (power of a nodal force set)."""
@@ -103,6 +104,7 @@ struct ForceEval
     E_axial::Float64
     E_panel::Float64
     E_hinge::Float64
+    E_hinge_released::Float64     # energy released this step by hinge state updates (dissipated)
     E_att::Float64
     PE_grav::Float64
     Fs_root::SVector{2,Float64}   # forces ON the root node (N/m)
@@ -127,8 +129,8 @@ function evaluate_forces!(ws::Workspace, p::SimParams, x, v, t::Float64,
     t < 0 && fill!(ws.Fd_settle, zero2)
 
     E_axial = axial_forces!(ws.F, ws.Fd_axial, ws.tension, x, v, lay.rest_length, p.k_axial, p.c_axial)
-    E_panel, E_hinge = bending_forces!(ws.F, ws.Fd_panel, ws.Fd_hinge, ws.theta, ws.curvature,
-        x, v, lay, p.k_bend, p.c_bend, p.hinge_law, p.fold_sign)
+    E_panel, E_hinge, E_released = bending_forces!(ws.F, ws.Fd_panel, ws.Fd_hinge, ws.theta, ws.curvature,
+        x, v, lay, p.k_bend, p.c_bend, p.hinge_law, p.fold_sign, ws.hinge_state)
 
     Fs_root, Fd_root = attachment_force(x[1], v[1], root_anchor, zero2, p.k_root, p.c_root)
     Fs_tip, Fd_tip = attachment_force(x[N], v[N], a_tip, adot_tip, p.k_tip, p.c_tip)
@@ -146,7 +148,7 @@ function evaluate_forces!(ws::Workspace, p::SimParams, x, v, t::Float64,
     if t < 0 && p.settle_alpha > 0
         mass_damping_forces!(ws.F, ws.Fd_settle, lay.mass, v, p.settle_alpha)
     end
-    ForceEval(E_axial, E_panel, E_hinge, E_att, PE, Fs_root, Fd_root, Fs_tip, Fd_tip)
+    ForceEval(E_axial, E_panel, E_hinge, E_released, E_att, PE, Fs_root, Fd_root, Fs_tip, Fd_tip)
 end
 
 # Names of the recorded time-series channels (sampled every `channel_dt`).
@@ -289,6 +291,9 @@ function simulate(p::SimParams;
     v = v0 === nothing ? zeros(SVector{2,Float64}, N) : collect(SVector{2,Float64}, v0)
     ws = Workspace(N)
     ws.theta .= turning_angles(x)
+    for i in lay.hinge_nodes
+        ws.hinge_state[i] = hinge_state_init(p.hinge_law, p.fold_sign[i] * ws.theta[i])
+    end
     rec = Recorder(p, t_start, t_end; record_fields)
     pk = Peaks()
     interior = panel_interior_nodes(lay)
@@ -327,6 +332,9 @@ function simulate(p::SimParams;
             p.drag ? -power(ws.Fd_drag, ws.vbar) : 0.0,
             t < 0 ? -power(ws.Fd_settle, ws.vbar) : 0.0)
         P_in = dot(fe.Fs_tip + fe.Fd_tip, adot_tip)
+
+        # Hinge-state releases happen at x_n: book them before centring.
+        fe.E_hinge_released != 0 && (D += SVector(0.0, 0.0, fe.E_hinge_released, 0.0, 0.0, 0.0))
 
         # Values centred on t_n (half of this step's power is included).
         Wc = W + 0.5dt * P_in
