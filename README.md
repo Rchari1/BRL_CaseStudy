@@ -36,6 +36,8 @@ Full ranking and recommended test order: **[SENSITIVITY.md](SENSITIVITY.md)**.
 - **Results:** why the peak is a whip, the sensitivity ranking, ground vs orbit, cell curvature, what to measure first.
 - **Backup:** a sheet showing where every placeholder value comes from.
 
+A PDF of the same 11 sheets is in **[`docs/Flarewing_Blanket_Deployment_Briefing.pdf`](docs/Flarewing_Blanket_Deployment_Briefing.pdf)**.
+
 Controls: <kbd>→</kbd>/<kbd>←</kbd> (or a presentation clicker) move between sheets, <kbd>F</kbd> toggles full screen, and <kbd>Space</kbd> plays the demo on sheet 5.
 
 To rebuild it after new runs (it reads the local `results/*/results.jld2` files): `julia --project=. tools/build_explorer.jl`.

@@ -228,7 +228,7 @@ table.basis td.p { white-space: nowrap; }
 #s11 .right { display: grid; gap: 1.1em; align-content: start; }
 
 /* compact screens: normal scrolling document */
-@media (max-width: 900px), (max-height: 620px) {
+@media screen and (max-width: 900px), screen and (max-height: 620px) {
   html { scroll-snap-type: none; }
   .sheet { height: auto; min-height: 0; padding-block: 40px 24px; }
   .body, #s2 .body, #s4 .body, #s5 .body, #s6 .body, #s7 .body, #s8 .body, #s9 .body { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; }
@@ -242,6 +242,16 @@ table.basis td.p { white-space: nowrap; }
   .rank-rows .rank-row { min-height: 2.8em; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* print / PDF: one sheet per 16:10 page, same geometry as a 1440×900 screen */
+@page { size: 1440px 900px; margin: 0; }
+@media print {
+  html { scroll-snap-type: none; }
+  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .rail, .hint, .tip-tt, #toPeak { display: none !important; }
+  .sheet { height: 900px; min-height: 0; overflow: hidden; break-after: page; page-break-after: always; }
+  .sheet:last-of-type { break-after: auto; page-break-after: auto; }
+}
 </style>
 </head>
 <body>
@@ -1081,6 +1091,8 @@ table.basis td.p { white-space: nowrap; }
   drawAll();
   let rt = null;
   window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(drawAll, 80); });
+  window.addEventListener("beforeprint", drawAll);
+  window.addEventListener("afterprint", drawAll);
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawAll);
 })();
 </script>
