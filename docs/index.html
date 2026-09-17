@@ -290,7 +290,7 @@ table.basis td.p { white-space: nowrap; }
       <div><span>05</span><span>What happens during deployment: live</span></div>
       <div><span>07</span><span>What drives the peak load</span></div>
       <div><span>10</span><span>What to measure first</span></div>
-      <div><span>11</span><span>The plan: timeline, stakeholders, who does what</span></div>
+      <div><span>11</span><span>The plan: two-week sprint, stakeholders, who does what</span></div>
       <div><span>12</span><span>Backup: where the numbers come from</span></div>
     </div>
     <figure>
@@ -486,41 +486,41 @@ table.basis td.p { white-space: nowrap; }
   <div class="tb"></div>
 </section>
 
-<section class="sheet" id="splan" data-title="Plan: timeline and stakeholders">
-  <div class="sheet-head"><div><span class="num">11</span><h2>From prototype to a <span style="white-space: nowrap">data-backed</span> model in about 14 weeks</h2></div>
-    <p class="lead" style="max-width: 44ch">A proposed plan. Week counts are estimates to agree with the team; every phase ends with a review and a hand-off.</p></div>
+<section class="sheet" id="splan" data-title="Plan: two-week sprint">
+  <div class="sheet-head"><div><span class="num">11</span><h2>A two-week sprint to a first <span style="white-space: nowrap">data-backed</span> model</h2></div>
+    <p class="lead" style="max-width: 46ch">Two weeks gets real coupon data into the model and a first blind correlation. Work that needs facility time or long dwell tests follows.</p></div>
   <div class="body">
     <div class="plan-scroll">
-      <div class="plan-grid" role="table" aria-label="Project timeline by phase">
+      <div class="plan-grid" role="table" aria-label="Two-week sprint plan by phase">
         <div class="corner"></div>
-        <div class="phase done"><span class="wk">Weeks 0–2</span><h3>1 · First simulation</h3><span class="state">Prototype built</span></div>
-        <div class="phase"><span class="wk">Weeks 2–6</span><h3>2 · Characterize the blanket</h3><span class="state">Coupon tests</span></div>
-        <div class="phase"><span class="wk">Weeks 6–10</span><h3>3 · Deployment tests</h3><span class="state">Blind prediction</span></div>
-        <div class="phase"><span class="wk">Weeks 10–14</span><h3>4 · Design loads</h3><span class="state">Hand-off</span></div>
+        <div class="phase done"><span class="wk">Days 1–3</span><h3>1 · Kick off and plan</h3><span class="state">Prototype built</span></div>
+        <div class="phase"><span class="wk">Days 3–7</span><h3>2 · Characterize the blanket</h3><span class="state">Coupon tests in air</span></div>
+        <div class="phase"><span class="wk">Days 8–10</span><h3>3 · Deployment test</h3><span class="state">Blind prediction</span></div>
+        <div class="phase"><span class="wk">After week 2</span><h3>4 · Follow-ons</h3><span class="state">As resources allow</span></div>
 
         <div class="rowlabel">Model</div>
-        <div>Planar beads-and-springs model with placeholder inputs; 58 verification checks; sensitivity sweeps</div>
-        <div>Measured fold curves (tabulated or hysteretic), fitted damping, gaps between cells, contact and friction in the stack</div>
-        <div>Air added mass and gravity offload in the model; predictions issued before each test</div>
-        <div>Two-way coupling with the structure model; start 3D; finite-element cross-check of a few cases</div>
+        <div>Prototype verified (58 checks); the sensitivity sweep picks which tests come first</div>
+        <div>Swap in measured fold curves (tabulated or hysteretic) and fitted damping</div>
+        <div>Issue predicted loads and fold angles before the test, then correlate</div>
+        <div>Gaps between cells, stack contact, air added mass; 3D model; coupling with the structure model; FE cross-check</div>
 
         <div class="rowlabel">Tests and data</div>
-        <div>None needed yet: the sweep ranks which unknowns to measure</div>
-        <div>Fold moment–angle vs stowage time and temperature; panel stiffness and cell bend limit; free-decay damping; attachment stiffness</div>
-        <div>Stow-and-release and partial deployments: load cell at the attachment, motion capture or DIC, several speeds; one vacuum or reduced-pressure run with offload</div>
-        <div>Correlated model runs the load cases; targeted re-tests where correlation is weak</div>
+        <div>Write the test plan and measurement requirements; build simple fixtures</div>
+        <div>Fold moment–angle with loading and unloading (short dwell); panel stiffness and cell bend limit; fold free-decay damping; attachment stiffness</div>
+        <div>Partial deployment or stow-and-release in air: load cell at the attachment, high-speed video, 2–3 speeds</div>
+        <div>Vacuum or reduced-pressure run with gravity offload; stowage-time and temperature dependence (needs long dwell)</div>
 
         <div class="rowlabel">Deliverable</div>
-        <div>Verified model, ranked unknowns, test priorities (this briefing)</div>
-        <div>Parameter database, model v2, updated sensitivity ranking</div>
-        <div>Pre-test prediction memo, then test correlation report; model v3</div>
-        <div>Load tables with margins, recommended deployment profile, analysis memo</div>
+        <div>Test plan and prioritized unknowns (this briefing)</div>
+        <div>Measured parameter set and model v2</div>
+        <div>Correlation note, load estimates with uncertainty, updated test priorities</div>
+        <div>Design loads with margins, recommended deployment profile, analysis memo</div>
 
         <div class="rowlabel">Stakeholders</div>
-        <div><b>Mechanisms:</b> tip motion, attachment points. <b>Structures:</b> attachment compliance</div>
-        <div><b>Test engineering:</b> fixtures. <b>Cell and blanket experts:</b> bend limits, laminate data</div>
-        <div><b>Test facilities:</b> vacuum chamber, offload rig. <b>Mechanisms:</b> drive profiles</div>
-        <div><b>Structures:</b> coupled model, FE check. <b>Systems:</b> requirements, design review</div>
+        <div><b>Mechanisms:</b> drive profile, attachment design. <b>Structures:</b> attachment compliance</div>
+        <div><b>Test engineering:</b> fixtures, instrumentation. <b>Cell and blanket experts:</b> bend limits, laminate data</div>
+        <div><b>Mechanisms:</b> run the deployment. <b>Systems:</b> review results and next steps</div>
+        <div><b>Test facilities:</b> chamber time, offload rig. <b>Structures:</b> coupled model, FE check</div>
       </div>
     </div>
     <div class="owners">
@@ -530,7 +530,7 @@ table.basis td.p { white-space: nowrap; }
           <li>Building, verifying and maintaining the model and sweeps</li>
           <li>Test requirements: what to measure, sample rates, accuracy</li>
           <li>Data reduction, parameter fitting, blind predictions, correlation</li>
-          <li>Load tables, the analysis memo and recommendations</li>
+          <li>Load estimates, the analysis memo and recommendations</li>
         </ul>
       </div>
       <div>
@@ -539,8 +539,8 @@ table.basis td.p { white-space: nowrap; }
           <li><b>Mechanisms:</b> real drive profiles, attachment design, which loads limit the mechanism</li>
           <li><b>Structures analysts:</b> truss compliance, the coupled model, FE cross-check</li>
           <li><b>Cell and blanket experts or supplier:</b> bend limits, laminate properties, how folds are made and stowed</li>
-          <li><b>Test engineering:</b> fixtures, vacuum chamber time, gravity offload, instrumentation (book long-lead items early)</li>
-          <li><b>Systems and leads:</b> load and deployment-time requirements, schedule priorities</li>
+          <li><b>Test engineering:</b> fixtures and instrumentation now; chamber time and gravity offload requested on day 1</li>
+          <li><b>Systems and leads:</b> load and deployment-time requirements, priorities</li>
         </ul>
       </div>
     </div>

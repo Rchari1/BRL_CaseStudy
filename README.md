@@ -34,7 +34,7 @@ Full ranking and recommended test order: **[SENSITIVITY.md](SENSITIVITY.md)**.
 - **The case:** problem, model, verification.
 - **Live demo:** scrub the deployment, with shape, tension and attachment loads moving together.
 - **Results:** why the peak is a whip, the sensitivity ranking, ground vs orbit, cell curvature, what to measure first.
-- **The plan:** a 14-week timeline from prototype to design loads, with stakeholders for each phase and what I would own vs ask for help with.
+- **The plan:** a two-week sprint to a first data-backed model (coupon tests, blind prediction of a deployment test), follow-on work, stakeholders for each phase, and what I would own vs ask for help with.
 - **Backup:** a sheet showing where every placeholder value comes from.
 
 A PDF of the same 12 sheets is in **[`docs/Flarewing_Blanket_Deployment_Briefing.pdf`](docs/Flarewing_Blanket_Deployment_Briefing.pdf)**.
