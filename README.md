@@ -30,13 +30,14 @@ Full ranking and recommended test order: **[SENSITIVITY.md](SENSITIVITY.md)**.
 
 ### Interactive briefing
 
-**[`docs/index.html`](docs/index.html)** is a presentation-ready briefing in a single self-contained file: download it and open it in any browser, offline if needed. It has 11 full-screen sheets:
+**[`docs/index.html`](docs/index.html)** is a presentation-ready briefing in a single self-contained file: download it and open it in any browser, offline if needed. It has 12 full-screen sheets:
 - **The case:** problem, model, verification.
 - **Live demo:** scrub the deployment, with shape, tension and attachment loads moving together.
 - **Results:** why the peak is a whip, the sensitivity ranking, ground vs orbit, cell curvature, what to measure first.
+- **The plan:** a 14-week timeline from prototype to design loads, with stakeholders for each phase and what I would own vs ask for help with.
 - **Backup:** a sheet showing where every placeholder value comes from.
 
-A PDF of the same 11 sheets is in **[`docs/Flarewing_Blanket_Deployment_Briefing.pdf`](docs/Flarewing_Blanket_Deployment_Briefing.pdf)**.
+A PDF of the same 12 sheets is in **[`docs/Flarewing_Blanket_Deployment_Briefing.pdf`](docs/Flarewing_Blanket_Deployment_Briefing.pdf)**.
 
 Controls: <kbd>→</kbd>/<kbd>←</kbd> (or a presentation clicker) move between sheets, <kbd>F</kbd> toggles full screen, and <kbd>Space</kbd> plays the demo on sheet 5.
 
