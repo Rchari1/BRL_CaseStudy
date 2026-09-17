@@ -28,6 +28,15 @@ The preload tension is 12.5 N/m. Forces are per metre of width, and the totals f
 
 Full ranking and recommended test order: **[SENSITIVITY.md](SENSITIVITY.md)**.
 
+### Interactive explorer
+
+**[`docs/index.html`](docs/index.html)** is a single self-contained file: download it and open it in any browser, with no install needed and offline use supported. It includes:
+- **Scrubbing.** Drag or play through any of the four runs and watch the blanket shape (colored by tension), the attachment loads and the fold angles move together.
+- **Peak jumps.** Jump straight to the peak load.
+- **Sweep explorer.** Click a parameter in the sensitivity ranking to see its sweep curve.
+
+To rebuild it after new runs (it reads the local `results/*/results.jld2` files): `julia --project=. tools/build_explorer.jl`.
+
 ![Sensitivity ranking](results/sweep/sensitivity.png)
 
 ---
@@ -263,5 +272,7 @@ src/
   cli.jl                       command-line handling
 test/test_verification.jl      Section 6 verification tests
 assets/fonts/                  Inter (SIL Open Font License)
+tools/build_explorer.jl        builds docs/index.html from results (template: tools/explorer_template.html)
+docs/index.html                standalone interactive explorer
 results/                       committed figures, animations, CSVs (large .jld2 files are git-ignored)
 ```
