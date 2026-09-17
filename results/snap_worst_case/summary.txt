@@ -1,0 +1,1 @@
+snap_worst_case | peak root 251.1 N/m (251.1 N total) | peak tip 260.5 N/m (260.5 N total) | at t = 30.48 s | peak tension 260.4 N/m | max panel curvature ratio 3.25 (EXCEEDS cell bend limit) | energy balance error 1.11e-06 | PLACEHOLDER PARAMETERS, NOT VALIDATED

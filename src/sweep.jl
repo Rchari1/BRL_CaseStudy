@@ -129,7 +129,7 @@ end
 Run every job on all available threads (start Julia with `-t auto`). Jobs that
 share a configuration (the baseline appears in every group) are run once.
 """
-function run_sweep(spec::SweepSpec; io = stdout)
+function run_sweep(spec::SweepSpec; io = stdout, cache_dir = joinpath(spec.out_dir, "runs"))
     jobs = sweep_jobs(spec)
     keyof(job) = YAML.write(merge(job.cfg, Dict("run_name" => "")))
     unique_keys = unique(keyof.(jobs))
@@ -138,18 +138,46 @@ function run_sweep(spec::SweepSpec; io = stdout)
     for job in jobs
         get!(first_job, keyof(job), job)
     end
-    @printf(io, "[sweep %s] %d runs (%d unique) on %d threads\n", spec.name, length(jobs), length(unique_keys), Threads.nthreads())
+    # Resumable: each finished run is cached as JSON keyed by a hash of its full config.
+    mkpath(cache_dir)
+    cache_file(k) = joinpath(cache_dir, string(hash(k); base = 16) * ".json")
     results = Vector{Dict{String,Any}}(undef, length(unique_keys))
+    todo = Int[]
+    for (i, k) in enumerate(unique_keys)
+        f = cache_file(k)
+        if isfile(f)
+            results[i] = Dict{String,Any}(JSON.parsefile(f))
+        else
+            push!(todo, i)
+        end
+    end
+    @printf(io, "[sweep %s] %d runs (%d unique, %d cached) on %d threads\n", spec.name, length(jobs),
+        length(unique_keys), length(unique_keys) - length(todo), Threads.nthreads())
+    flush(io)
+    # Longest runs first so the thread pool stays busy at the end.
+    cost(i) = (j = first_job[unique_keys[i]]; num(j.cfg, "deployment.T_deploy") / num(j.cfg, "blanket.panel_length") * num(j.cfg, "blanket.nodes_per_panel"))
+    sort!(todo; by = cost, rev = true)
     done = Threads.Atomic{Int}(0)
     t0 = time()
     lk = ReentrantLock()
-    Threads.@threads :dynamic for i in eachindex(unique_keys)
-        results[i] = run_job(first_job[unique_keys[i]])
-        n = Threads.atomic_add!(done, 1) + 1
-        lock(lk) do
-            @printf(io, "  %3d/%d done  (%.0f s elapsed)\n", n, length(unique_keys), time() - t0)
+    # Shared work queue: every thread pulls the next job, so no thread idles
+    # while another still holds a backlog (fixed chunking would).
+    queue = Channel{Int}(length(todo))
+    foreach(i -> put!(queue, i), todo)
+    close(queue)
+    workers = map(1:Threads.nthreads()) do _
+        Threads.@spawn for i in queue
+            res = run_job(first_job[unique_keys[i]])
+            results[i] = res
+            lock(lk) do
+                n = Threads.atomic_add!(done, 1) + 1
+                open(f -> JSON.print(f, res), cache_file(unique_keys[i]), "w")
+                @printf(io, "  %3d/%d done  (%.0f s elapsed)\n", n, length(todo), time() - t0)
+                flush(io)
+            end
         end
     end
+    foreach(wait, workers)
     rows = Dict{String,Any}[]
     for job in jobs
         row = copy(results[index[keyof(job)]])

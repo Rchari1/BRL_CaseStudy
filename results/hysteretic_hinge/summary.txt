@@ -1,0 +1,1 @@
+hysteretic_hinge | peak root 266.8 N/m (266.8 N total) | peak tip 267.9 N/m (267.9 N total) | at t = 30.08 s | peak tension 267.9 N/m | max panel curvature ratio 2.42 (EXCEEDS cell bend limit) | energy balance error 1.42e-05 | PLACEHOLDER PARAMETERS, NOT VALIDATED

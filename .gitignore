@@ -2,3 +2,4 @@
 results/**/results.jld2
 *.jls
 .DS_Store
+results/sweep/runs/

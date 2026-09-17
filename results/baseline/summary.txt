@@ -1,0 +1,1 @@
+baseline | peak root 408.1 N/m (408.1 N total) | peak tip 443.4 N/m (443.4 N total) | at t = 28.74 s | peak tension 443.2 N/m | max panel curvature ratio 3.3 (EXCEEDS cell bend limit) | energy balance error 7.49e-08 | PLACEHOLDER PARAMETERS, NOT VALIDATED

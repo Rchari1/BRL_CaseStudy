@@ -1,0 +1,1 @@
+ground_test | peak root 173.6 N/m (173.6 N total) | peak tip 173.6 N/m (173.6 N total) | at t = 30.07 s | peak tension 173.6 N/m | max panel curvature ratio 3.29 (EXCEEDS cell bend limit) | energy balance error 1.93e-08 | PLACEHOLDER PARAMETERS, NOT VALIDATED
