@@ -28,12 +28,15 @@ The preload tension is 12.5 N/m. Forces are per metre of width, and the totals f
 
 Full ranking and recommended test order: **[SENSITIVITY.md](SENSITIVITY.md)**.
 
-### Interactive explorer
+### Interactive briefing
 
-**[`docs/index.html`](docs/index.html)** is a single self-contained file: download it and open it in any browser, with no install needed and offline use supported. It includes:
-- **Scrubbing.** Drag or play through any of the four runs and watch the blanket shape (colored by tension), the attachment loads and the fold angles move together.
-- **Peak jumps.** Jump straight to the peak load.
-- **Sweep explorer.** Click a parameter in the sensitivity ranking to see its sweep curve.
+**[`docs/index.html`](docs/index.html)** is a presentation-ready briefing in a single self-contained file: download it and open it in any browser, offline if needed. It has 11 full-screen sheets:
+- **The case:** problem, model, verification.
+- **Live demo:** scrub the deployment, with shape, tension and attachment loads moving together.
+- **Results:** why the peak is a whip, the sensitivity ranking, ground vs orbit, cell curvature, what to measure first.
+- **Backup:** a sheet showing where every placeholder value comes from.
+
+Controls: <kbd>→</kbd>/<kbd>←</kbd> (or a presentation clicker) move between sheets, <kbd>F</kbd> toggles full screen, and <kbd>Space</kbd> plays the demo on sheet 5.
 
 To rebuild it after new runs (it reads the local `results/*/results.jld2` files): `julia --project=. tools/build_explorer.jl`.
 
